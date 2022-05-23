@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --partition=gpu
-#SBATCH -J exercise2
-#SBATCH --time=00:10:00
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --gres=gpu:1
-#SBATCH --mem=10Gb
-#SBATCH --output=%A-%a.out
-#SBATCH --error=%A-%a.err
-#SBATCH --array=1-10%1	#execute 10 array jobs, 1 at a time.
+#SBATCH --partition=gpu		#Set partition to "gpu"
+#SBATCH -J exercise2		#Set job name
+#SBATCH --time=00:10:00		#Set job time limit
+#SBATCH --nodes=1		#Set number of nodes to 1
+#SBATCH --ntasks=1		#Set number of cpus to 1
+#SBATCH --gres=gpu:1		#Request 1 GPU
+#SBATCH --mem=10Gb		#Request 10GB of RAM memory
+#SBATCH --output=%A-%a.out      #set output filename with main job ID and task array ID
+#SBATCH --error=%A-%a.err       #set error filename with main job ID and task array ID
+#SBATCH --array=1-10%1		#execute 10 array jobs, 1 at a time.
 
 #Load the conda environment:
 module load miniconda3/2020-09
