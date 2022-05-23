@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --partition=debug
-#SBATCH -J exercise1
-#SBATCH --time=00:02:00
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --output=%A-%a.out
-#SBATCH --error=%A-%a.err
-#SBATCH --array=1-10%1	#execute 10 array jobs, 1 at a time.
+#SBATCH --partition=debug	#set partition to "debug"
+#SBATCH -J exercise1		#set job name
+#SBATCH --time=00:02:00		#set job time limit to 2 minutes
+#SBATCH --nodes=1		#set node number to 1
+#SBATCH --ntasks=1		#set tasks number to 1 (cpus)
+#SBATCH --output=%A-%a.out      #set output filename with main job ID and task array ID
+#SBATCH --error=%A-%a.err       #set error filename with main job ID and task array ID
+#SBATCH --array=1-10%1		#execute 10 array jobs, 1 at a time.
 
 #Clean your env first:
 conda deactivate
