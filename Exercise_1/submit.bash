@@ -9,7 +9,8 @@
 #SBATCH --array=1-10%1		#execute 10 array jobs, 1 at a time.
 
 #Clean your env first:
-conda deactivate
+## Deactivate your existing conda environment - uncomment the below line if you have a conda environemnt automatically loaded through your ~/.bashrc
+#conda deactivate
 module purge
 
 #Load the conda environment:
