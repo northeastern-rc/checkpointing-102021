@@ -12,7 +12,7 @@ training modules.
 2. Enter your desired directory within Discovery and download the training material. For example:
 ```bash
 cd $HOME
-git clone <url>
-cd <repo-name-tag>
+git clone git@github.com:northeastern-rc/training-checkpointing.git
+cd training-checkpointing
 ```
 3. Download the training slides to your local computer, where you have access to PowerPoint to open the slides. Follow the slides to execute different examples.
