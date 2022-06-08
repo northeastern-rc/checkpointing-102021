@@ -28,7 +28,7 @@ RESTARTSCRIPT="dmtcp_restart_script.sh"
 export DMTCP_QUIET=2
 
 #! Define the command to be run by setting variable $runcmd:
-runcmd="../example_array 5"
+runcmd="./example_array 5"
 #! Define the checkpointing time interval (in seconds):
 tint=30
 
