@@ -29,34 +29,30 @@ def save_ckp(state, is_best, checkpoint_dir):
     :param best_model_dir:
     :return:
     """
-    f_path = checkpoint_dir / 'checkpoint.pt'
+    f_path = checkpoint_dir / "checkpoint.pt"
     torch.save(state, f_path)
     if is_best:
         print("New best model!")
-        best_fpath = checkpoint_dir / 'best_model.pt'
+        best_fpath = checkpoint_dir / "best_model.pt"
         shutil.copyfile(f_path, best_fpath)
+
 
 def prepare_dataloaders(data_dir, batch):
     # Loading the MNIST Dataset from Pytorch
     # Import MNIST dataset
-    train_dataset = torchvision.datasets.MNIST(root=data_dir,
-                                               train=True,
-                                               transform=transforms.ToTensor(),
-                                               download=True)
+    train_dataset = torchvision.datasets.MNIST(
+        root=data_dir, train=True, transform=transforms.ToTensor(), download=True
+    )
 
-    test_dataset = torchvision.datasets.MNIST(root=data_dir,
-                                              train=False,
-                                              transform=transforms.ToTensor())
+    test_dataset = torchvision.datasets.MNIST(
+        root=data_dir, train=False, transform=transforms.ToTensor()
+    )
 
     # Importing the Dataloader & specify Batch size
     # Data loader
-    train_loader_out = DataLoader(dataset=train_dataset,
-                                  batch_size=batch,
-                                  shuffle=True)
+    train_loader_out = DataLoader(dataset=train_dataset, batch_size=batch, shuffle=True)
 
-    test_loader_out = DataLoader(dataset=test_dataset,
-                                 batch_size=batch,
-                                 shuffle=False)
+    test_loader_out = DataLoader(dataset=test_dataset, batch_size=batch, shuffle=False)
 
     return train_loader_out, test_loader_out
 
