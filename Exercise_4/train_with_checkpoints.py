@@ -1,7 +1,5 @@
 import argparse
-import os
-import os.path
-import sys
+import shutil
 from pathlib import Path
 
 import torch
@@ -9,7 +7,6 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-import shutil
 
 use_cuda = torch.cuda.is_available()
 device = "cuda"
