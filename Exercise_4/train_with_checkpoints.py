@@ -55,20 +55,6 @@ class NeuralNet(nn.Module):
         return out
 
 
-def create_model():
-    """####Define a simple sequential model:"""
-    model = tf.keras.models.Sequential([
-        keras.layers.Dense(512, activation='relu', input_shape=(784,)),
-        keras.layers.Dropout(0.2),
-        keras.layers.Dense(10)
-    ])
-
-    model.compile(optimizer='adam',
-                  loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True),
-                  metrics=[tf.metrics.SparseCategoricalAccuracy()])
-
-    return model
-
 if __name__ == '__main__':
     print(f"PyTorch {torch.__version__}")
     print(f"On GPU: {use_cuda}")
