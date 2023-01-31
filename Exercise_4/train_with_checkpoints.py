@@ -81,10 +81,14 @@ if __name__ == '__main__':
     # '/work/bootcamp/tutorials/'
     parser.add_argument('-d', '--data', type=str, default='../data/',
                         help='Directory of MNIST: if MNIST is in "data," load; else, download.')
-    parser.add_argument('-e', '--epochs', type=int, default=1,
+    parser.add_argument('-e', '--epochs', type=int, default=2,
                         help='The number of epochs to train model.')
     parser.add_argument('-v', '--val', type=int, default=1,
                         help='Run validation every v-th epoch.')
+    parser.add_argument('-o', '--out', type=str, default='training_4',
+                        help='Directory to save checkpoints.')
+
+
     args = parser.parse_args()
     # hyperparameters for our neural network
     num_epochs = args.epochs
@@ -99,10 +103,12 @@ if __name__ == '__main__':
     # epoch number of steps for each job, get it as a commandline argument:
 
     # Include the epoch in the file name (uses `str.format`)
-    checkpoint_path = "training_4/{epoch:d}.ckpt"
+    # checkpoint_path = "training_4/{epoch:d}.ckpt"
+    model_dir = args.out
+    # checkpoint_dir = f"{model_dir}/checkpoint/"
+    model_path = Path(model_dir)
+    model_path.mkdir(exist_ok=True, parents=True)
 
-    checkpoint_dir = os.path.dirname(checkpoint_path)
-    Path(checkpoint_dir).mkdir(exist_ok=True, parents=True)
     # Create a new model instance
     model = NeuralNet(input_size, hidden_size, num_classes)
     model = model.to("gpu") if use_cuda else model
@@ -161,19 +167,11 @@ if __name__ == '__main__':
                 # Accuracy of the network on the 10,000 test images: 97.3%
                 print(f'Accuracy of the network on epoch {epoch + 1}: {acc} %')
 
-                torch.save({
+                checkpoint = {
                     'epoch': epoch,
                     'model_state_dict': model.state_dict(),
                     'optimizer_state_dict': optimizer.state_dict(),
-                    'accuracy': top_accuracy,
-                }, f"{checkpoint_dir}/checkpoint.pt")
-
-                if acc > top_accuracy:
-                    top_accuracy = acc
-                    torch.save({
-                        'epoch': epoch,
-                        'model_state_dict': model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict(),
-                        'accuracy': top_accuracy,
-                    }, f"{checkpoint_dir}/best_model.pt")
+                    'accuracy': acc,
+                }
+                save_ckp(checkpoint, acc > top_accuracy, model_path)
 
