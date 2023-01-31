@@ -11,7 +11,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
 use_cuda = torch.cuda.is_available()
-
+device = "cuda"
 
 def prepare_dataloaders(data_dir, batch):
     # Loading the MNIST Dataset from Pytorch
