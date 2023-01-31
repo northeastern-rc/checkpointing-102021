@@ -89,7 +89,7 @@ if __name__ == "__main__":
         "-d",
         "--data",
         type=str,
-        default="../data/",  # "/work/bootcamp/tutorials/",
+        default="../data/",
         help='Directory of MNIST: if MNIST is in "data," load; else, download.',
     )
     parser.add_argument(
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args, "\n====\n")
     load_checkpoint = args.checkpoint
-    
+
     # hyperparameters for our neural network
     num_epochs = args.epochs
     input_size = 784  # 28x28
@@ -123,9 +123,7 @@ if __name__ == "__main__":
     learning_rate = 0.001
 
     train_loader, test_loader = prepare_dataloaders(args.data, batch_size)
-    # epoch number of steps for each job, get it as a commandline argument:
 
-    # Include the epoch in the file name (uses `str.format`)
     model_dir = args.out
     model_path = Path(model_dir)
     model_path.mkdir(exist_ok=True, parents=True)
@@ -187,9 +185,8 @@ if __name__ == "__main__":
                         images = images.to(device)
                         labels = labels.to(device)
 
-                    # images = images.reshape(-1, 28 * 28).to(device)
-                    # labels = labels.to(device)
                     outputs = model(images)
+
                     # max returns (value ,index)
                     _, predicted = torch.max(outputs.data, 1)
                     n_samples += labels.size(0)
