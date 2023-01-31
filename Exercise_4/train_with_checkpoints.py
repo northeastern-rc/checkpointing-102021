@@ -9,9 +9,27 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+import shutil
 
 use_cuda = torch.cuda.is_available()
 device = "cuda"
+
+def save_ckp(state, is_best, checkpoint_dir):
+    """
+     Save the state to the specified checkpoint directory. In addition to that, if the model is the best model till now,
+     the same checkpoint is also copied to another directory to keep track of the best model.
+    :param state:
+    :param is_best:
+    :param checkpoint_dir:
+    :param best_model_dir:
+    :return:
+    """
+    f_path = checkpoint_dir / 'checkpoint.pt'
+    torch.save(state, f_path)
+    if is_best:
+        print("New best model!")
+        best_fpath = checkpoint_dir / 'best_model.pt'
+        shutil.copyfile(f_path, best_fpath)
 
 def prepare_dataloaders(data_dir, batch):
     # Loading the MNIST Dataset from Pytorch
