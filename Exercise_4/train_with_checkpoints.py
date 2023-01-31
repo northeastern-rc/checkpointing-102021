@@ -13,10 +13,17 @@ device = "cuda"
 
 
 def load_ckp(checkpoint_fpath, model, optimizer):
-    checkpoint = torch.load(checkpoint_fpath)
-    model.load_state_dict(checkpoint["state_dict"])
-    optimizer.load_state_dict(checkpoint["optimizer"])
-    return model, optimizer, checkpoint["epoch"]
+    """
+    Load checkpoint.
+    :param checkpoint_fpath:
+    :param model:
+    :param optimizer:
+    :return:
+    """
+    ckp = torch.load(checkpoint_fpath)
+    model.load_state_dict(ckp["model_state_dict"])
+    optimizer.load_state_dict(ckp["optimizer_state_dict"])
+    return model, optimizer, ckp["epoch"], ckp["accuracy"]
 
 
 def save_ckp(state, is_best, checkpoint_dir):
@@ -26,7 +33,6 @@ def save_ckp(state, is_best, checkpoint_dir):
     :param state:
     :param is_best:
     :param checkpoint_dir:
-    :param best_model_dir:
     :return:
     """
     f_path = checkpoint_dir / "checkpoint.pt"
@@ -74,29 +80,45 @@ class NeuralNet(nn.Module):
         return out
 
 
-if __name__ == '__main__':
-    print(f"PyTorch {torch.__version__}")
+if __name__ == "__main__":
+    print(f"PyTorch {torch.__version__}: Begin")
     print(f"On GPU: {use_cuda}")
 
-    parser = argparse.ArgumentParser(description='Checkpointing PyTorch Models.')
-    # '/work/bootcamp/tutorials/'
-    parser.add_argument('-d', '--data', type=str, default='../data/',
-                        help='Directory of MNIST: if MNIST is in "data," load; else, download.')
-    parser.add_argument('-e', '--epochs', type=int, default=2,
-                        help='The number of epochs to train model.')
-    parser.add_argument('-v', '--val', type=int, default=1,
-                        help='Run validation every v-th epoch.')
-    parser.add_argument('-o', '--out', type=str, default='training_4',
-                        help='Directory to save checkpoints.')
-
-
+    parser = argparse.ArgumentParser(description="Checkpointing PyTorch Models.")
+    parser.add_argument(
+        "-d",
+        "--data",
+        type=str,
+        default="../data/",  # "/work/bootcamp/tutorials/",
+        help='Directory of MNIST: if MNIST is in "data," load; else, download.',
+    )
+    parser.add_argument(
+        "-e",
+        "--epochs",
+        type=int,
+        default=6,
+        help="The number of epochs to train model.",
+    )
+    parser.add_argument(
+        "-v", "--val", type=int, default=1, help="Run validation every v-th epoch."
+    )
+    parser.add_argument(
+        "-o",
+        "--out",
+        type=str,
+        default="training_4",
+        help="Directory to save checkpoints.",
+    )
+    parser.add_argument("-c", "--checkpoint", action="store_true")  # on/off flag
     args = parser.parse_args()
+    print(args, "\n====\n")
+    load_checkpoint = args.checkpoint
+    
     # hyperparameters for our neural network
     num_epochs = args.epochs
     input_size = 784  # 28x28
     hidden_size = 500
     num_classes = 10
-    # num_epochs = 2
     batch_size = 100
     learning_rate = 0.001
 
@@ -104,26 +126,33 @@ if __name__ == '__main__':
     # epoch number of steps for each job, get it as a commandline argument:
 
     # Include the epoch in the file name (uses `str.format`)
-    # checkpoint_path = "training_4/{epoch:d}.ckpt"
     model_dir = args.out
-    # checkpoint_dir = f"{model_dir}/checkpoint/"
     model_path = Path(model_dir)
     model_path.mkdir(exist_ok=True, parents=True)
 
     # Create a new model instance
     model = NeuralNet(input_size, hidden_size, num_classes)
     model = model.to("gpu") if use_cuda else model
-
+    ckp_path = model_path / "checkpoint.pt"
     # Setting our Loss and Optimizer Functions
     # We are using Adam optimizer here.
-
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    start_epoch = 0
+    top_accuracy = 0.0
+    if ckp_path.exists() and load_checkpoint:
+        print(f"Loading checkpoint\n===\npath:{ckp_path}")
+        model, optimizer, start_epoch, top_accuracy = load_ckp(
+            ckp_path, model, optimizer
+        )
+        print(
+            f"Start Epoch: {start_epoch + 1}/{num_epochs}\naccuracy: {top_accuracy}\n===\n"
+        )
 
     n_total_steps = len(train_loader)
-    top_accuracy = 0.0
-    for epoch in range(num_epochs):
+    for epoch in range(start_epoch + 1, num_epochs + 1):
+        print(f"Epoch: {epoch} / {num_epochs}")
         for nbatch, (images, labels) in enumerate(train_loader):
             # origin shape: [100, 1, 28, 28]
             # resized: [100, 784]
@@ -141,9 +170,11 @@ if __name__ == '__main__':
             optimizer.step()
             # To Print the Loss at every 100th step and show our total steps
             if (nbatch + 1) % 100 == 0:
-                print(f'Epoch [{epoch + 1}/{num_epochs}], Step[{nbatch + 1}/{n_total_steps}], Loss: {loss.item():.4f}')
+                print(
+                    f"Epoch [{epoch}/{num_epochs}], Step[{nbatch + 1}/{n_total_steps}], Loss: {loss.item():.4f}"
+                )
 
-        if (epoch + 1) % args.val == 0 or epoch == num_epochs - 1:
+        if (epoch + 1) % args.val == 0 or epoch == num_epochs:
             # every v-th epoch AND the last epoch
             print("Testing of the Model and Evaluating Accuracy")
             with torch.no_grad():
@@ -166,13 +197,14 @@ if __name__ == '__main__':
 
                 acc = 100.0 * n_correct / n_samples
                 # Accuracy of the network on the 10,000 test images: 97.3%
-                print(f'Accuracy of the network on epoch {epoch + 1}: {acc} %')
+                print(f"Accuracy of the network on epoch {epoch}: {acc} %")
 
                 checkpoint = {
-                    'epoch': epoch,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'accuracy': acc,
+                    "epoch": epoch,
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "accuracy": acc,
                 }
                 save_ckp(checkpoint, acc > top_accuracy, model_path)
-
+        print("===\n")
+    print("Complete!")
