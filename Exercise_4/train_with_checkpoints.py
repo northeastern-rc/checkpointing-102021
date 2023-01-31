@@ -11,6 +11,14 @@ from torch.utils.data import DataLoader
 use_cuda = torch.cuda.is_available()
 device = "cuda"
 
+
+def load_ckp(checkpoint_fpath, model, optimizer):
+    checkpoint = torch.load(checkpoint_fpath)
+    model.load_state_dict(checkpoint["state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer"])
+    return model, optimizer, checkpoint["epoch"]
+
+
 def save_ckp(state, is_best, checkpoint_dir):
     """
      Save the state to the specified checkpoint directory. In addition to that, if the model is the best model till now,
