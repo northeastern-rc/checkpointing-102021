@@ -57,3 +57,5 @@ different examples.
 -[ ] Add links to each tutorial
 -[ ] Reformat all code using consistent formatting
 -[ ] Add README to each exercise 
+-[ ] Demo for Scikit-learn
+-[ ] Demo for PyTorch Lightning 
