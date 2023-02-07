@@ -59,3 +59,4 @@ different examples.
 -[ ] Add README to each exercise 
 -[ ] Demo for Scikit-learn
 -[ ] Demo for PyTorch Lightning 
+-[ ] Point to `/datasets/` for tutorial data, opposed to downloading for each user.
