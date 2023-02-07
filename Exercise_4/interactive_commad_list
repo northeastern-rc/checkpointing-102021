@@ -22,9 +22,12 @@ train_with_checkpoints.py --help
 python restore_from_checkpoint.py --data /work/bootcamp/tutorials/ --epochs 2 --out "training_4" --checkpoint
 
 # List the resulting models saved
-ls training_4
+ls -lt training_4
 
 # Continue training from last checkpoint
 python restore_from_checkpoint.py --data /work/bootcamp/tutorials/ --epochs 6 --checkpoint
+
+# List the resulting models saved
+ls -lt training_4
 
 cat train_with_checkpoints.py
